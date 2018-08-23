@@ -120,11 +120,16 @@ contract Agreement {
 
         require( msg.sender == _Placer || msg.sender == _Taker);
 
+        // add sender to list
+
+        // if list has both parties ...
+
         if(_Disputed == true) {
             // fees payable to adjudicator
         }
 
-        // balance returned to parties
+        // return balance to parties
+
 
         // kill contract
     }
