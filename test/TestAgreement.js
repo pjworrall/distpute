@@ -35,6 +35,17 @@ contract('Agreement', function(accounts) {
         })
     });
 
+    // not sure how to test this behaviour properly because how do you handle a throw/revert
+    it("should only allow Layer and Taker to Determine outcome", function() {
+        return Agreement.deployed().then(function(instance) {
+            return instance.setBeneficiary({from: accounts[3]});
+        }).then(function () {
+            assert(false,"should have error with throw or revert");
+        }).catch(function (err) {
+            assert.equal(err, "Error: VM Exception while processing transaction: revert", "did not throw or revert as expected");
+        });
+    });
+
 
     it("should provide a receipt when Originator sets as the Beneficiary", function() {
         return Agreement.deployed().then(function(instance) {
@@ -63,7 +74,7 @@ contract('Agreement', function(accounts) {
         });
     });
 
-    // "should only allow Layer and Taker to Determine outcome"
+    //
 
 
 });
