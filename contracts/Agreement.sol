@@ -20,14 +20,15 @@ contract Agreement {
     event Determined(address indexed determiningParty);
     event Dispute(address indexed disputingParty);
     event Favoured(address indexed favouredParty);
+    event Settled(address indexed beneficiary, address indexed adjudicator);
 
     // this Contract would be produced by a Factory that would ensure the Adjudicator address is safely supplied
-    // the _adjudicator could be a Contract address of a Multi-Sig wallet of course
-    constructor(string subject, address taker, address _adjudicator) public {
+    // the adjudicator could be a Contract address of a Multi-Sig wallet of course
+    constructor(string subject, address taker, address adjudicator) public {
         _Placer = msg.sender;
         _Subject = subject;
         _Taker = taker;
-        _Adjudicator = _adjudicator;
+        _Adjudicator = adjudicator;
     }
 
     function setAccepted() public {
@@ -48,6 +49,8 @@ contract Agreement {
         return _Disputed;
     }
 
+    // either party may claim to be the beneficiary
+
     function setBeneficiary() public {
 
         require( _Determined == false );
@@ -65,7 +68,7 @@ contract Agreement {
         return _Beneficiary;
     }
 
-    // this will come from a library contract, either the placer or the taker can raise a dispute
+    // either the placer or the taker can raise a dispute
 
     function setDispute() public {
 
@@ -89,14 +92,41 @@ contract Agreement {
         _Beneficiary = favoured;
         _Determined = true;
 
+        emit Favoured(favoured);
+
     }
 
     // causes the settlement [separate set of contracts]
 
-    function settle() public pure {
+    function settle() public {
 
-        // After satisfying all criteria go ahead and pay fees and settle in Favour
+        require( msg.sender == _Placer || msg.sender == _Taker);
 
+        if(_Disputed == true) {
+            // fees payable to adjudicator
+        }
+
+        // After satisfying all criteria go ahead and pay fees and settle to the beneficiary
+
+        // settlement needs to come from the parties from their mutual agreement or from adjudication
+
+
+        emit Settled(_Beneficiary,_Adjudicator); // although _Adjudicator might not have been used
+    }
+
+    // cancellation needs to be agreed by both parties and, if an adjudicator was used, will still pay their fees
+
+    function cancel() public view {
+
+        require( msg.sender == _Placer || msg.sender == _Taker);
+
+        if(_Disputed == true) {
+            // fees payable to adjudicator
+        }
+
+        // balance returned to parties
+
+        // kill contract
     }
     
 
