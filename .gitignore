@@ -1,0 +1,36 @@
+# Created by .ignore support plugin
+
+.idea
+
+# any mnemonic keys we would prefer not to be on the public store
+keys
+
+# OpenZeppelin inspired
+
+*.swp
+*.swo
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+allFiredEvents
+scTopics
+
+
+# node-waf configuration
+.lock-wscript
+
+
+# Debug log from npm
+npm-debug.log
+
+# local env variables
+.env
+
+# truffle build directory
+build/
