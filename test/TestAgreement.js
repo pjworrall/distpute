@@ -74,7 +74,10 @@ contract('Agreement', function(accounts) {
         });
     });
 
-    //
+    // Only the Placer or the Taker can lodge a dispute
+
+    // Only the Adjudicator can set Favour
+    // Adjudicator can only Favour the parties to the Contract
 
 
 });
