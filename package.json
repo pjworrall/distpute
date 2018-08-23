@@ -19,5 +19,6 @@
   ],
   "author": "Paul Worrall <paul.worrall@interition.net> (https://uk.linkedin.com/in/worrall)",
   "license": "SEE LICENSE IN LICENSE.TXT",
-  "homepage": "https://bitbucket.org/interition/distpute#readme"
+  "homepage": "https://bitbucket.org/interition/distpute#readme",
+  "devDependencies": {}
 }
