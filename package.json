@@ -1,0 +1,23 @@
+{
+  "name": "distpute",
+  "version": "0.0.1",
+  "description": "Distributed dispute resolution framework for Smart Contracts",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://interition@bitbucket.org/interition/distpute.git"
+  },
+  "keywords": [
+    "dispute",
+    "framework"
+  ],
+  "author": "Paul Worrall <paul.worrall@interition.net> (https://uk.linkedin.com/in/worrall)",
+  "license": "SEE LICENSE IN LICENSE.TXT",
+  "homepage": "https://bitbucket.org/interition/distpute#readme"
+}

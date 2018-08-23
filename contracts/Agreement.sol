@@ -1,5 +1,9 @@
 pragma solidity ^0.4.22;
 
+/**
+ * @title Agreement
+ * @dev First stab at an Agreement between two parties with dispute resolution
+ */
 
 contract Agreement {
 
@@ -16,10 +20,36 @@ contract Agreement {
     string private _Subject;
     bool private _Accepted = false;
 
+    /**
+     * event to report a Taker for the Agreement
+     * @param taker who took the other side of the agreement
+     * @param subject about which the parties are taking a view
+    */
     event Accepted(address indexed taker, string subject);
+
+    /**
+     * event to notify that a request for the outcome to be determined
+     * @param determiningParty that made the determination request
+    */
     event Determined(address indexed determiningParty);
+
+    /**
+     * event to notify that the outcome is being disputed
+     * @param disputingParty who as raised the dispute
+    */
     event Dispute(address indexed disputingParty);
+
+    /**
+     * event to notify who the Adjudicator has favoured in the dispute
+     * @param favouredParty who has been determined to be the beneficiary after dispute resolution
+    */
     event Favoured(address indexed favouredParty);
+
+    /**
+     * event to notify that the Agreement has been settled
+     * @param beneficiary who received the proceeds
+     * @param adjudicator Contract or Account that settled the dispute and took the fees
+    */
     event Settled(address indexed beneficiary, address indexed adjudicator);
 
     // this Contract would be produced by a Factory that would ensure the Adjudicator address is safely supplied
@@ -37,6 +67,7 @@ contract Agreement {
         emit Accepted(msg.sender,_Subject);
     }
 
+    // @return true if crowdsale event has ended
     function getSubject() public view returns(string) {
         return _Subject;
     }
