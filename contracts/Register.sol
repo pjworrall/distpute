@@ -59,8 +59,8 @@ contract Register {
     function setAdjudicator(address adjudicator) onlyKYCProvider  public {
 
         adjudicators.push(adjudicator);
-
         emit Registered(adjudicator);
+
     }
 
     function setKYCProvider(address provider) onlyOwner public {

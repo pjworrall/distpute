@@ -26,4 +26,30 @@ contract('Register', function(accounts) {
             assert.equal(n,5, "number of adjudicators incorrect");
         });
     });
+
+    it("should allow KYCProvider to add Adjudicator", function() {
+        return Register.deployed().then(function(instance) {
+            return instance.setAdjudicator(accounts[5],{from: accounts[1]});
+        }).then(function(receipt) {
+
+            // @todo I am referring to the logs in the receipt object naughtily
+            var adjudicator  = receipt.logs[0].args.adjudicator;
+
+            assert.equal(adjudicator,accounts[5],"adjudicator address incorrect");
+
+        });
+    });
+
+    //
+    it("should only allow KYCProvider to add Adjudicator", function() {
+        return Register.deployed().then(function (instance) {
+            return instance.setAdjudicator(accounts[5],{from: accounts[3]});
+        }).then(function () {
+            assert(false,"should have error with throw or revert");
+        }).catch(function (err) {
+            assert.equal(err, "Error: VM Exception while processing transaction: revert", "did not throw or revert as expected");
+        });
+    });
+
+
 });
