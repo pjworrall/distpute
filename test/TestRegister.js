@@ -17,4 +17,13 @@ contract('Register', function(accounts) {
             assert.equal(accounts[1],address, "was not the KYC Provider");
         });
     });
+
+    it("should return all adjudicators", function() {
+        return Register.deployed().then(function(instance) {
+            return instance.getAllRegistered.call();
+        }).then(function(adjudicators) {
+            var n = adjudicators.length;
+            assert.equal(n,5, "number of adjudicators incorrect");
+        });
+    });
 });

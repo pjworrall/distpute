@@ -3,7 +3,7 @@ let Agreement = artifacts.require("Agreement");
 // Granache public MNEMONIC for testing
 // dog double video above tuna afford almost jazz exclude rural level flag
 
-module.exports = function(deployer) {
+module.exports = function(deployer, network, accounts) {
     // constructor arguments
     // const subject = "I bet ten pounds GBP that rain falls on St. Paul's Cathedral in London anytime during August 31st 2018";
     const subject = "TBD";
