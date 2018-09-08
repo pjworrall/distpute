@@ -27,18 +27,17 @@ contract Factory {
     }
 
     /**
-    * @author Paul Worrall
     * @notice This is the Factory for Agreements in the DistPute Smart Contract framework.
     * @dev It ensures Agreements are not vulnerable to compromise because they have to be
-    * created from blockchain protected code. The Factory will also allocate the first set
-    * of Adjudicators picked from the Register. Note: no Adjudicator skill categories yet.
+    * @dev created from blockchain protected code. The Factory will also allocate the first set
+    * @dev of Adjudicators picked from the Register. Note: no Adjudicator skill categories yet.
     */
 
     function newAgreement(string subject, address taker, address adjudicator) public
     {
         /// @todo need to pick a list of adjudicators from the Register and pass as array argument once supported
 
-        Agreement a = new Agreement(subject,taker,adjudicator);
+        Agreement a = new Agreement(subject,msg.sender,taker,adjudicator);
         agreements.push(a);
         emit AgreementCreated(msg.sender, a);
     }

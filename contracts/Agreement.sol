@@ -4,14 +4,15 @@ pragma solidity ^0.4.22;
  * @title Agreement
  * @author Paul Worrall
  * @notice This is part of the DistPute Smart Contract framework
- * @dev First stab at an Agreement between two parties with dispute resolution
+ * @dev Second generation of Agreement to accomodate the change of cryptographic ownership of the contract when created by a Factory
  */
 
 contract Agreement {
 
-    address private _Placer;
-    address private _Taker;
-    address private _Adjudicator;
+    // public for testing purposes
+    address public _Originator;
+    address public _Taker;
+    address public _Adjudicator;
 
     address private _Beneficiary;
 
@@ -23,41 +24,47 @@ contract Agreement {
     bool private _Accepted = false;
 
     /**
-     * event to report a Taker for the Agreement
+     * @notice event to report a Taker for the Agreement
      * @param taker who took the other side of the agreement
      * @param subject about which the parties are taking a view
     */
     event Accepted(address indexed taker, string subject);
 
     /**
-     * event to notify that a request for the outcome to be determined
+     * @notice event to notify that a request for the outcome to be determined
      * @param determiningParty that made the determination request
     */
     event Determined(address indexed determiningParty);
 
     /**
-     * event to notify that the outcome is being disputed
+     * @notice event to notify that the outcome is being disputed
      * @param disputingParty who as raised the dispute
     */
     event Dispute(address indexed disputingParty);
 
     /**
-     * event to notify who the Adjudicator has favoured in the dispute
+     * @notice event to notify who the Adjudicator has favoured in the dispute
      * @param favouredParty who has been determined to be the beneficiary after dispute resolution
     */
     event Favoured(address indexed favouredParty);
 
     /**
-     * event to notify that the Agreement has been settled
+     * @notice event to notify that the Agreement has been settled
      * @param beneficiary who received the proceeds
      * @param adjudicator Contract or Account that settled the dispute and took the fees
     */
     event Settled(address indexed beneficiary, address indexed adjudicator);
 
-    /// this Contract would be produced by a Factory that would ensure the Adjudicator address is safely supplied
-    /// the adjudicator could be a Contract address of a Multi-Sig wallet of course
-    constructor(string subject, address taker, address adjudicator) public {
-        _Placer = msg.sender;
+
+    /**
+     * @notice Constructor to be used by a Factory contract. Note the msg.send is the Factory class and not the Originator.
+     * @param subject text of the Binary Agreement that the parties commit to. Plain text but can be a Complex Type in future.
+     * @param originator is the first party to the Agreement
+     * @param taker is the counter party to the Agreement
+     * @param adjudicator identifies who decides a Disputed outcome, which can be another Smart Contract Address.
+    */
+    constructor(string subject, address originator ,address taker, address adjudicator) public {
+        _Originator = originator;
         _Subject = subject;
         _Taker = taker;
         _Adjudicator = adjudicator;
@@ -69,19 +76,19 @@ contract Agreement {
     function setAccepted() public {
         require(msg.sender == _Taker);
         _Accepted = true;
-        emit Accepted(msg.sender,_Subject);
+        emit Accepted(msg.sender, _Subject);
     }
 
     /// @return subject of agreement
-    function getSubject() public view returns(string) {
+    function getSubject() public view returns (string) {
         return _Subject;
     }
 
-    function isAccepted() public view returns(bool) {
+    function isAccepted() public view returns (bool) {
         return _Accepted;
     }
 
-    function isDisputed() public view returns(bool) {
+    function isDisputed() public view returns (bool) {
         return _Disputed;
     }
 
@@ -89,9 +96,9 @@ contract Agreement {
 
     function setBeneficiary() public {
 
-        require( _Determined == false );
+        require(_Determined == false);
 
-        require( msg.sender == _Placer || msg.sender == _Taker);
+        require(msg.sender == _Originator || msg.sender == _Taker);
 
         _Beneficiary = msg.sender;
 
@@ -100,7 +107,7 @@ contract Agreement {
         emit Determined(msg.sender);
     }
 
-    function getBeneficiary() public view returns(address) {
+    function getBeneficiary() public view returns (address) {
         return _Beneficiary;
     }
 
@@ -108,9 +115,9 @@ contract Agreement {
 
     function setDispute() public {
 
-        require( _Disputed == false );
+        require(_Disputed == false);
 
-        require( msg.sender == _Placer || msg.sender == _Taker);
+        require(msg.sender == _Originator || msg.sender == _Taker);
 
         _Determined = false;
         _Disputed = true;
@@ -121,9 +128,9 @@ contract Agreement {
     /// adjudicator settles the contract in one parties favour
     /// if Adjudicator is multi-sig wallet/Adjudicator registry Contract this will be called from that
     function setFavour(address favoured) public {
-        require( msg.sender == _Adjudicator );
+        require(msg.sender == _Adjudicator);
 
-        require(favoured == _Placer || favoured == _Taker);
+        require(favoured == _Originator || favoured == _Taker);
 
         _Beneficiary = favoured;
         _Determined = true;
@@ -136,9 +143,9 @@ contract Agreement {
 
     function settle() public {
 
-        require( msg.sender == _Placer || msg.sender == _Taker);
+        require(msg.sender == _Originator || msg.sender == _Taker);
 
-        if(_Disputed == true) {
+        if (_Disputed == true) {
             /// fees payable to adjudicator
         }
 
@@ -147,20 +154,21 @@ contract Agreement {
         /// settlement needs to come from the parties from their mutual agreement or from adjudication
 
 
-        emit Settled(_Beneficiary,_Adjudicator); // although _Adjudicator might not have been used
+        emit Settled(_Beneficiary, _Adjudicator);
+        // although _Adjudicator might not have been used
     }
 
     /// cancellation needs to be agreed by both parties and, if an adjudicator was used, will still pay their fees
 
     function cancel() public view {
 
-        require( msg.sender == _Placer || msg.sender == _Taker);
+        require(msg.sender == _Originator || msg.sender == _Taker);
 
         /// add sender to list
 
         /// if list has both parties ...
 
-        if(_Disputed == true) {
+        if (_Disputed == true) {
             /// fees payable to adjudicator
         }
 
@@ -169,6 +177,6 @@ contract Agreement {
 
         /// kill contract
     }
-    
+
 
 }

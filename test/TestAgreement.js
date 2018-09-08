@@ -36,7 +36,7 @@ contract('Agreement', function(accounts) {
     });
 
     // not sure how to test this behaviour properly because how do you handle a throw/revert
-    it("should only allow Layer and Taker to Determine outcome", function() {
+    it("should only allow Originator and Taker to Determine outcome", function() {
         return Agreement.deployed().then(function(instance) {
             return instance.setBeneficiary({from: accounts[3]});
         }).then(function () {
@@ -74,7 +74,7 @@ contract('Agreement', function(accounts) {
         });
     });
 
-    // Only the Placer or the Taker can lodge a dispute
+    // Only the Originator or the Taker can lodge a dispute
 
     // Only the Adjudicator can set Favour
     // Adjudicator can only Favour the parties to the Contract
