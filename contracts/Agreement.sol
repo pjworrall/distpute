@@ -63,13 +63,16 @@ contract Agreement {
         _Adjudicator = adjudicator;
     }
 
+    /**
+     * @notice Taker role will Accept the agreement
+    */
     function setAccepted() public {
         require(msg.sender == _Taker);
         _Accepted = true;
         emit Accepted(msg.sender,_Subject);
     }
 
-    /// @return true if crowdsale event has ended
+    /// @return subject of agreement
     function getSubject() public view returns(string) {
         return _Subject;
     }
