@@ -9,19 +9,19 @@ pragma solidity ^0.4.22;
 
 contract Agreement {
 
-    // public for testing purposes
+    // contract fields public for testing purposes (although technically they are always publicq)
     address public _Originator;
     address public _Taker;
     address public _Adjudicator;
 
-    address private _Beneficiary;
+    address public _Beneficiary;
 
-    bool private _Determined = false;
-    bool private _Disputed = false;
+    bool public _Determined = false;
+    bool public _Disputed = false;
 
     /// for testing the subject is a trivial text statement but will be a Contract adhering to an Interface standard
-    string private _Subject;
-    bool private _Accepted = false;
+    string public _Subject;
+    bool public _Accepted = false;
 
     /**
      * @notice event to report a Taker for the Agreement
