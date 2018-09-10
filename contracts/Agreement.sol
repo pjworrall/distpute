@@ -46,7 +46,7 @@ contract Agreement {
      * @notice event to notify who the Adjudicator has favoured in the dispute
      * @param favouredParty who has been determined to be the beneficiary after dispute resolution
     */
-    event Favoured(address indexed favouredParty);
+    event Favoured(address indexed adjudicator,address indexed originator, address indexed favouredParty);
 
     /**
      * @notice event to notify that the Agreement has been settled
@@ -135,7 +135,7 @@ contract Agreement {
         _Beneficiary = favoured;
         _Determined = true;
 
-        emit Favoured(favoured);
+        emit Favoured(_Adjudicator, _Originator, _Beneficiary);
 
     }
 
