@@ -20,5 +20,8 @@
   "author": "Paul Worrall <paul.worrall@interition.net> (https://uk.linkedin.com/in/worrall)",
   "license": "SEE LICENSE IN LICENSE.TXT",
   "homepage": "https://bitbucket.org/interition/distpute#readme",
-  "devDependencies": {}
+  "devDependencies": {},
+  "dependencies": {
+    "openzeppelin-solidity": "^2.0.0-rc.1"
+  }
 }
