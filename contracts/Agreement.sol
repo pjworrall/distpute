@@ -78,19 +78,25 @@ contract Agreement {
     }
 
     /**
-     * @notice Taker role will Accept the agreement
+     * @notice Token balance that the agreement holds. Not necessarily used as any token credits cannot be
+     * tracked in this contract
      * @return balance ,the token balance controlled by this agreement
      */
-    function getBalance() public view returns (uint256) {
+    function getTokenBalance() public view returns (uint256) {
         uint256 balance = _token.balanceOf(this);
         return balance;
     }
 
     /**
-     * @notice Taker role will Accept the agreement
+     * @notice Taker role will Accept the agreement and must match the Token balance staked by the Originator
+     * @notice see Escrow Pattern (url)
     */
     function setAccepted() public {
         require(msg.sender == _Taker);
+
+        // check the taker escrow address has a balance equal to the Originator
+
+
         _Accepted = true;
         emit Accepted(msg.sender, _Subject);
     }
