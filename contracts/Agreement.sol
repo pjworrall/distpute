@@ -3,11 +3,16 @@ pragma solidity ^0.4.22;
 /**
  * @title Agreement
  * @author Paul Worrall
- * @notice This is part of the DistPute Smart Contract framework
- * @dev Second generation of Agreement to accomodate the change of cryptographic ownership of the contract when created by a Factory
+ * @notice This is part of the DistPute Smart Contract framework. Escrow supported by checking the token balance
+ * provided to the Agreement by the Originator.
+ * @dev third generation that provides for some escrow
  */
 
+import 'openzeppelin-solidity/contracts/token/ERC20/IERC20.sol';
+
 contract Agreement {
+
+    IERC20 _token ;
 
     // contract fields public for testing purposes (although technically they are always publicq)
     address public _Originator;
@@ -61,13 +66,24 @@ contract Agreement {
      * @param subject text of the Binary Agreement that the parties commit to. Plain text but can be a Complex Type in future.
      * @param originator is the first party to the Agreement
      * @param taker is the counter party to the Agreement
+     * @param token is the address of the ERC20 token used for escrow
      * @param adjudicator identifies who decides a Disputed outcome, which can be another Smart Contract Address.
     */
-    constructor(string subject, address originator ,address taker, address adjudicator) public {
+    constructor(string subject, address originator ,address taker, address adjudicator, address token) public {
         _Originator = originator;
         _Subject = subject;
         _Taker = taker;
         _Adjudicator = adjudicator;
+        _token = IERC20(token);
+    }
+
+    /**
+     * @notice Taker role will Accept the agreement
+     * @return balance ,the token balance controlled by this agreement
+     */
+    function getBalance() public view returns (uint256) {
+        uint256 balance = _token.balanceOf(this);
+        return balance;
     }
 
     /**

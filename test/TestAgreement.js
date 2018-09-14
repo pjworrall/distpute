@@ -79,5 +79,7 @@ contract('Agreement', function(accounts) {
     // Only the Adjudicator can set Favour
     // Adjudicator can only Favour the parties to the Contract
 
+    // test that a balance can be correctly returned
+
 
 });

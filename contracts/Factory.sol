@@ -33,11 +33,11 @@ contract Factory {
     * @dev of Adjudicators picked from the Register. Note: no Adjudicator skill categories yet.
     */
 
-    function newAgreement(string subject, address taker, address adjudicator) public
+    function newAgreement(string subject, address taker, address adjudicator, address token) public
     {
         /// @todo need to pick a list of adjudicators from the Register and pass as array argument once supported
 
-        Agreement a = new Agreement(subject,msg.sender,taker,adjudicator);
+        Agreement a = new Agreement(subject,msg.sender,taker,adjudicator,token);
         agreements.push(a);
         emit AgreementCreated(msg.sender, a);
     }
