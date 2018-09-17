@@ -42,7 +42,7 @@ contract('Token', function(accounts) {
             let to = receipt.logs[0].args.to;
             let value =receipt.logs[0].args.value;
 
-            console.log("transfer event reported from: " + from + ", to: " + to + ", value: " + value );
+           // console.log("transfer event reported from: " + from + ", to: " + to + ", value: " + value );
 
             assert.equal(to,accounts[1],'event did not report transfer was to account[1]');
 
