@@ -49,6 +49,17 @@ contract('Escrow', function (accounts) {
 
         }).then(function (receipt) {
 
+            // check the event
+            let event = receipt.logs[0].event;
+
+            assert.equal(event,"Released","Event was not Released");
+
+            let params = receipt.logs[0].args; // need to understand if there is only one event instance in a receipt
+
+            console.log("Escrow release event: " + receipt.logs[0].event + ", Agreement: " + params.agreement + ", beneficiary: " + params.beneficiary + ", amount: " + params.amount );
+
+            // get the balance to check later
+
             let token = Token.at("0x7c21f56495fc1e8cccf850cb3d6d05b74200ac37");
 
             return token.balanceOf("0x36Aa95084900D2c01514B0E0e9D0B901511c786C");
@@ -57,6 +68,7 @@ contract('Escrow', function (accounts) {
 
             assert.equal(balance, 1000, "release address did not have expected balance");
 
+
         });
     });
 
@@ -64,6 +76,9 @@ contract('Escrow', function (accounts) {
     // should not be able to release from Escrow if not Agreement
 
     // should report an event for a release
+
+
+
 
 
 });

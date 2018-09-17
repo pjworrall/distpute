@@ -18,6 +18,14 @@ contract Escrow {
     IERC20 private _erc20;
 
     /**
+    * @notice event to report an Agreement has released the escrow to a specified Address
+    * @param agreement that release the escrow
+    * @param beneficiary that received the tokens
+    * @param amount of tokens released
+    */
+    event Released(address indexed agreement, address beneficiary, uint256 amount);
+
+    /**
     * @notice Constructor to be used by an Agreement contract to hold a counter parties stake
     * @param erc20 address of the ERC20 Token Contract
     */
@@ -35,6 +43,8 @@ contract Escrow {
         uint256 balance = _erc20.balanceOf(this);
 
         _erc20.transfer(beneficiary,balance);
+
+        emit Released(_agreement, beneficiary, balance);
     }
 
 }
