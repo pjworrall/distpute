@@ -43,7 +43,7 @@ contract Factory {
         Agreement agreement = new Agreement(subject,msg.sender,taker,adjudicator,token);
         agreements.push(agreement);
 
-        emit AgreementCreated(msg.sender, agreement,agreement.getOriginatorEscrow(),agreement.getOriginatorEscrow());
+        emit AgreementCreated(msg.sender, agreement,agreement.getOriginatorEscrow(),agreement.getTakerEscrow());
 
     }
 

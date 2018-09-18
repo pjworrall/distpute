@@ -44,11 +44,13 @@ contract('Factory', function (accounts) {
                 }
             }
 
-            console.log("originator escrow address: " + event.args.originatorEscrow);
+            console.log("originator escrow: " + event.args.originatorEscrow + " , taker: " + event.args.takerEscrow);
 
             assert(event.args.originatorEscrow,"Originator escrow address not found");
 
             assert(event.args.takerEscrow,"Taker escrow address not found");
+
+            assert.notEqual(event.args.originatorEscrow,event.args.takerEscrow,"Escrow accounts for parties should not be the same");
 
         });
     });
