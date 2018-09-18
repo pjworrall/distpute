@@ -1,6 +1,7 @@
 pragma solidity ^0.4.22;
 
 import "./Agreement.sol";
+import "./Escrow.sol";
 
 /**
  * @title Factory
@@ -14,12 +15,21 @@ contract Factory {
     /// this won't necessarily be used in a production version
     address[] public agreements;
 
+    //mapping(_KeyType => _ValueType) public escrows;
+
     /**
      * event to report the new agreement creation
      * @param from the creator of the Agreement
      * @param agreement address
     */
     event AgreementCreated(address indexed from, Agreement agreement);
+
+    /**
+    * event to report an escrow account was created
+    * @param originator who requested the Agreement
+    * @param escrow contract for the originator
+    */
+    event EscrowCreated(address indexed agreement, address indexed originator, address indexed escrow);
 
     function getAgreementCount() public view returns(uint agreementCount)
     {
@@ -37,9 +47,14 @@ contract Factory {
     {
         /// @todo need to pick a list of adjudicators from the Register and pass as array argument once supported
 
-        Agreement a = new Agreement(subject,msg.sender,taker,adjudicator,token);
-        agreements.push(a);
-        emit AgreementCreated(msg.sender, a);
+        Agreement agreement = new Agreement(subject,msg.sender,taker,adjudicator,token);
+        agreements.push(agreement);
+
+        emit AgreementCreated(msg.sender, agreement);
+
+        Escrow escrow = new Escrow(token);
+
+        emit EscrowCreated(agreement,msg.sender,escrow);
     }
 
 }
