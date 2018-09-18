@@ -20,9 +20,10 @@ contract Factory {
      * event to report the new agreement creation
      * @param from the creator of the Agreement
      * @param agreement address
-     * @param escrow contract for the originator
+     * @param originatorEscrow escrow contract for the originator
+     * @param takerEscrow escrow contract for the taker
     */
-    event AgreementCreated(address indexed from, Agreement agreement, address escrow);
+    event AgreementCreated(address indexed from, Agreement agreement, address originatorEscrow, address takerEscrow);
 
     /**
     * @notice This is the Factory for Agreements in the DistPute Smart Contract framework.
@@ -42,7 +43,7 @@ contract Factory {
         Agreement agreement = new Agreement(subject,msg.sender,taker,adjudicator,token);
         agreements.push(agreement);
 
-        emit AgreementCreated(msg.sender, agreement,agreement.getOriginatorEscrow());
+        emit AgreementCreated(msg.sender, agreement,agreement.getOriginatorEscrow(),agreement.getOriginatorEscrow());
 
     }
 

@@ -31,8 +31,9 @@ contract Agreement {
     string public _Subject;
     bool public _Accepted = false;
 
-    // this is the escrow contract
+    // these are the escrow contracts
     Escrow public _OriginatorEscrow;
+    Escrow public _TakerEscrow;
 
     /**
      * @notice event to report a Taker for the Agreement
@@ -89,15 +90,25 @@ contract Agreement {
 
         _OriginatorEscrow = new Escrow(token);
 
+        _TakerEscrow = new Escrow(token);
+
     }
 
 
     /**
      * @notice Originators escrow contact
-     * @return address of the escrow contract
+     * @return address of the originator escrow contract
      */
     function getOriginatorEscrow() public view returns (address) {
         return _OriginatorEscrow;
+    }
+
+    /**
+     * @notice Taker escrow contact
+     * @return address of the taker escrow contract
+    */
+    function getTakerEscrow() public view returns (address) {
+        return _TakerEscrow;
     }
 
 

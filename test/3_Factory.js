@@ -44,9 +44,11 @@ contract('Factory', function (accounts) {
                 }
             }
 
-            //console.log("escrow address: " + event.args.escrow);
+            console.log("originator escrow address: " + event.args.originatorEscrow);
 
-            assert(event,"Escrow address not found");
+            assert(event.args.originatorEscrow,"Originator escrow address not found");
+
+            assert(event.args.takerEscrow,"Taker escrow address not found");
 
         });
     });
