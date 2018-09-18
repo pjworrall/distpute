@@ -24,29 +24,29 @@ contract('Factory', function (accounts) {
         });
     });
 
-    it("should be able to get access to an escrow account", function () {
+    it("should report an escrow account for the Originator", function () {
         return Factory.deployed().then(function (instance) {
             return instance.newAgreement("Rain on Monday", accounts[1], accounts[1], ERC20Token, {from: accounts[0]});
         }).then(function (result) {
 
-            // Go through all the log events and pick the EscrowCreated
+            //console.log(JSON.stringify(result));
 
-            // We can loop through result.logs to see if we triggered the Transfer event.
+            // Go through all the log events and pick the AgreementCreated
 
-            let event = false;
+            let event = undefined;
 
             for (var i = 0; i < result.logs.length; i++) {
                 var log = result.logs[i];
 
-                if (log.event == "EscrowCreated") {
-                    event = true;
+                if (log.event === "AgreementCreated") {
+                    event = log;
                     break;
                 }
             }
 
-            console.log("Event was: " + event);
+            //console.log("escrow address: " + event.args.escrow);
 
-            assert(event,"Escrow creation event was not reported");
+            assert(event,"Escrow address not found");
 
         });
     });

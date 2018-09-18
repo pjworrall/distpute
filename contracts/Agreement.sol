@@ -8,7 +8,10 @@ pragma solidity ^0.4.22;
  * @dev third generation that provides for some escrow
  */
 
+import "./Escrow.sol";
+
 import 'openzeppelin-solidity/contracts/token/ERC20/IERC20.sol';
+
 
 contract Agreement {
 
@@ -27,6 +30,9 @@ contract Agreement {
     /// for testing the subject is a trivial text statement but will be a Contract adhering to an Interface standard
     string public _Subject;
     bool public _Accepted = false;
+
+    // this is the escrow contract
+    Escrow public _OriginatorEscrow;
 
     /**
      * @notice event to report a Taker for the Agreement
@@ -75,12 +81,31 @@ contract Agreement {
         _Taker = taker;
         _Adjudicator = adjudicator;
         _token = IERC20(token);
+
+        /**
+        * Create an escrow contract for the Originator to place their tokens in escrow
+        * This agreement will control the tokens provided to this Escrow contract
+        */
+
+        _OriginatorEscrow = new Escrow(token);
+
     }
+
+
+    /**
+     * @notice Originators escrow contact
+     * @return address of the escrow contract
+     */
+    function getOriginatorEscrow() public view returns (address) {
+        return _OriginatorEscrow;
+    }
+
 
     /**
      * @notice Token balance that the agreement holds. Not necessarily used as any token credits cannot be
      * tracked in this contract
      * @return balance ,the token balance controlled by this agreement
+     * @dev Obsolete because we cannot isolate escrow holdings if using the Agreement holds the tokens
      */
     function getTokenBalance() public view returns (uint256) {
         uint256 balance = _token.balanceOf(this);

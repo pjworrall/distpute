@@ -1,7 +1,6 @@
 pragma solidity ^0.4.22;
 
 import "./Agreement.sol";
-import "./Escrow.sol";
 
 /**
  * @title Factory
@@ -21,26 +20,19 @@ contract Factory {
      * event to report the new agreement creation
      * @param from the creator of the Agreement
      * @param agreement address
+     * @param escrow contract for the originator
     */
-    event AgreementCreated(address indexed from, Agreement agreement);
-
-    /**
-    * event to report an escrow account was created
-    * @param originator who requested the Agreement
-    * @param escrow contract for the originator
-    */
-    event EscrowCreated(address indexed agreement, address indexed originator, address indexed escrow);
-
-    function getAgreementCount() public view returns(uint agreementCount)
-    {
-        return agreements.length;
-    }
+    event AgreementCreated(address indexed from, Agreement agreement, address escrow);
 
     /**
     * @notice This is the Factory for Agreements in the DistPute Smart Contract framework.
     * @dev It ensures Agreements are not vulnerable to compromise because they have to be
-    * @dev created from blockchain protected code. The Factory will also allocate the first set
-    * @dev of Adjudicators picked from the Register. Note: no Adjudicator skill categories yet.
+    * created from blockchain protected code.
+    * @dev The subject at some point will become a more sophisticated object but should still produce a binary determination
+    * @param subject is just a string describing what the parties are taking positions on
+    * @param taker is the address of the counter party
+    * @param adjudicator is the address of the contract or person who will settle a dispute
+    * @param token is the address of the ERC20 token being exchanged
     */
 
     function newAgreement(string subject, address taker, address adjudicator, address token) public
@@ -50,11 +42,14 @@ contract Factory {
         Agreement agreement = new Agreement(subject,msg.sender,taker,adjudicator,token);
         agreements.push(agreement);
 
-        emit AgreementCreated(msg.sender, agreement);
+        emit AgreementCreated(msg.sender, agreement,agreement.getOriginatorEscrow());
 
-        Escrow escrow = new Escrow(token);
-
-        emit EscrowCreated(agreement,msg.sender,escrow);
     }
+
+    function getAgreementCount() public view returns(uint agreementCount)
+    {
+        return agreements.length;
+    }
+
 
 }
