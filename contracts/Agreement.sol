@@ -132,6 +132,7 @@ contract Agreement {
 
         // check the taker escrow address has a balance equal to the Originator
 
+        // require(_token.balanceOf(address(_TakerEscrow)) > 9000 );
 
         _Accepted = true;
         emit Accepted(msg.sender, _Subject);

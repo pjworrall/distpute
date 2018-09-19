@@ -1,5 +1,13 @@
 var Agreement = artifacts.require("Agreement");
 
+var Token = artifacts.require("Token");
+
+// @todo check that there isn't a better pattern for making variables available across promises
+let _escrowAddress = undefined;
+let _takerEscrowAmount = 10000;
+
+// @todo tests are having state dependencies on previous tests - is that an ok pattern?
+
 contract('Agreement', function(accounts) {
     it("should be TBD for the Agreement Subject", function() {
         return Agreement.deployed().then(function(instance) {
@@ -16,6 +24,72 @@ contract('Agreement', function(accounts) {
             assert.isFalse(accepted, "was accepted at origination");
         });
     });
+
+    it("should provide Taker with escrow account", function() {
+        return Agreement.deployed().then(function(instance) {
+            return instance.getTakerEscrow();
+        }).then(function(address) {
+            console.log("Taker escrow address: " + JSON.stringify(address));
+            // @todo: this test should really check that the address is formatted as a Ethereum Address
+            assert(address, "address was not provided");
+        });
+    });
+
+    it("should not allow Taker to accept without escrow being staked by both parties", function() {
+        return Agreement.deployed().then(function(instance) {
+            return instance.setAccepted({from: accounts[1]});
+        }).then(function () {
+            assert(false,"should have error with throw or revert");
+        }).catch(function (err) {
+            assert.equal(err, "Error: VM Exception while processing transaction: revert", "did not throw or revert as expected");
+        });
+    });
+
+    it("should be able to credit the Taker escrow account with tokens", function() {
+        return Agreement.deployed().then(function(instance) {
+            return instance.getTakerEscrow();
+        }).then(function(address) {
+
+            _escrowAddress = address;
+
+            // @todo need a helper to get the correct token contract address for the test suite instance!!!!
+
+            return Token.at("0x7c21f56495fc1e8cccf850cb3d6d05b74200ac37");
+        }).then(function(token) {
+
+            // @todo test might be more coherent if a Taker account is used that has been provided with a token balance
+            // using accounts[0] here as source of Tokens which inconsistent because it plays the role of Originator
+
+            return token.transfer(_escrowAddress,_takerEscrowAmount,{from: accounts[0]});
+        }).then(function(result) {
+
+            // @todo we need some kind of helper function because this pattern is repeated in a lot of tests
+
+            // checking the Transfer event
+
+            let event = undefined;
+
+            for (var i = 0; i < result.logs.length; i++) {
+                var log = result.logs[i];
+
+                if (log.event === "Transfer") {
+                    event = log;
+                    break;
+                }
+            }
+
+            let from = log.args.from;
+            let to = log.args.to;
+            let value = log.args.value;
+
+            assert.equal(from,accounts[0],"Failed to credit Taker escrow account, from address wrong");
+            assert.equal(to,_escrowAddress,"Failed to credit Taker escrow account, to address wrong");
+            assert.equal(value,_takerEscrowAmount,"Failed to credit Taker escrow account, value wrong");
+
+        });
+    });
+
+
 
     it("should provide a receipt after Taker accepts", function() {
         return Agreement.deployed().then(function(instance) {
@@ -63,6 +137,7 @@ contract('Agreement', function(accounts) {
         })
     });
 
+    // @todo Need to confirm pattern for handling throws/reverts.
     // not sure how to test this behaviour properly because how do you handle a throw/revert
     it("should not be able to set Beneficiary if already set", function() {
         return Agreement.deployed().then(function (instance) {
