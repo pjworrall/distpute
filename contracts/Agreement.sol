@@ -164,11 +164,9 @@ contract Agreement {
 
     /// either party may claim to be the beneficiary
 
-    function setBeneficiary() public {
+    function setBeneficiary() isParty public {
 
         require(_Determined == false);
-
-        require(msg.sender == _Originator || msg.sender == _Taker);
 
         _Beneficiary = msg.sender;
 
@@ -183,11 +181,9 @@ contract Agreement {
 
     /// either the placer or the taker can raise a dispute
 
-    function setDispute() public {
+    function setDispute() isParty public {
 
         require(_Disputed == false);
-
-        require(msg.sender == _Originator || msg.sender == _Taker);
 
         _Determined = false;
         _Disputed = true;
@@ -197,10 +193,8 @@ contract Agreement {
 
     /// adjudicator settles the contract in one parties favour
     /// if Adjudicator is multi-sig wallet/Adjudicator registry Contract this will be called from that
-    function setFavour(address favoured) public {
+    function setFavour(address favoured) isParty public {
         require(msg.sender == _Adjudicator);
-
-        require(favoured == _Originator || favoured == _Taker);
 
         _Beneficiary = favoured;
         _Determined = true;
@@ -211,9 +205,7 @@ contract Agreement {
 
     /// causes the settlement [separate set of contracts]
 
-    function settle() public {
-
-        require(msg.sender == _Originator || msg.sender == _Taker);
+    function settle() public isParty {
 
         if (_Disputed == true) {
             /// fees payable to adjudicator
@@ -230,9 +222,7 @@ contract Agreement {
 
     /// cancellation needs to be agreed by both parties and, if an adjudicator was used, will still pay their fees
 
-    function cancel() public view {
-
-        require(msg.sender == _Originator || msg.sender == _Taker);
+    function cancel() isParty public view {
 
         /// add sender to list
 

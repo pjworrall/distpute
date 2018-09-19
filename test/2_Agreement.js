@@ -157,8 +157,7 @@ contract('Agreement', function(accounts) {
         })
     });
 
-    // not sure how to test this behaviour properly because how do you handle a throw/revert
-    it("should only allow Originator and Taker to Determine outcome", function() {
+    it("should only allow Originator and Taker to set Beneficiary", function() {
         return Agreement.deployed().then(function(instance) {
             return instance.setBeneficiary({from: accounts[3]});
         }).then(function () {
@@ -197,7 +196,16 @@ contract('Agreement', function(accounts) {
         });
     });
 
-    // Only the Originator or the Taker can lodge a dispute
+    it("should only allow Originator and Taker to set dispute", function() {
+        return Agreement.deployed().then(function(instance) {
+            return instance.setDispute({from: accounts[3]});
+        }).then(function () {
+            assert(false,"should have error with throw or revert");
+        }).catch(function (err) {
+            assert.equal(err, "Error: VM Exception while processing transaction: revert", "did not throw or revert as expected");
+        });
+    });
+
 
     // Only the Adjudicator can set Favour
 
