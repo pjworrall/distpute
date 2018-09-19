@@ -39,7 +39,6 @@ contract Agreement {
 
     /**
     * @notice ensures only parties to the contract can effect change on the Agreement
-    * @dev AS YET NEEDS TO BE APPLIED WHERE NECESSARY
     */
 
     modifier isParty {
