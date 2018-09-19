@@ -27,6 +27,8 @@ contract Agreement {
     bool public _Determined = false;
     bool public _Disputed = false;
 
+    uint256 private _minimumStake = 1;
+
     /// for testing the subject is a trivial text statement but will be a Contract adhering to an Interface standard
     string public _Subject;
     bool public _Accepted = false;
@@ -34,6 +36,30 @@ contract Agreement {
     // these are the escrow contracts
     Escrow public _OriginatorEscrow;
     Escrow public _TakerEscrow;
+
+    /**
+    * @notice ensures only parties to the contract can effect change on the Agreement
+    * @dev AS YET NEEDS TO BE APPLIED WHERE NECESSARY
+    */
+
+    modifier isParty {
+        require(msg.sender == _Originator || msg.sender == _Taker);
+        _;
+    }
+
+    /**
+    * @notice ensures Escrow has been staked before doing anything
+    * @dev the Originator has to have staked greater than _minimumStake and, initially, the Taker stake has to be the equal
+    */
+
+    modifier isStaked {
+        require(_token.balanceOf(address(_OriginatorEscrow)) > _minimumStake );
+
+        require(_token.balanceOf(address(_TakerEscrow)) >= _token.balanceOf(address(_OriginatorEscrow)) );
+
+        _;
+    }
+
 
     /**
      * @notice event to report a Taker for the Agreement
@@ -111,28 +137,13 @@ contract Agreement {
         return _TakerEscrow;
     }
 
-
-    /**
-     * @notice Token balance that the agreement holds. Not necessarily used as any token credits cannot be
-     * tracked in this contract
-     * @return balance ,the token balance controlled by this agreement
-     * @dev Obsolete because we cannot isolate escrow holdings if using the Agreement holds the tokens
-     */
-    function getTokenBalance() public view returns (uint256) {
-        uint256 balance = _token.balanceOf(this);
-        return balance;
-    }
-
     /**
      * @notice Taker role will Accept the agreement and must match the Token balance staked by the Originator
      * @notice see Escrow Pattern (url)
+     * @dev hmm..does "require" consume gas because that might be undesirable if this function reverts/throws due to the Originator escrow not being staked ?
     */
-    function setAccepted() public {
+    function setAccepted() isStaked public {
         require(msg.sender == _Taker);
-
-        // check the taker escrow address has a balance equal to the Originator
-
-        // require(_token.balanceOf(address(_TakerEscrow)) > 9000 );
 
         _Accepted = true;
         emit Accepted(msg.sender, _Subject);
