@@ -8,7 +8,10 @@ let _originatorEscrowAddress = undefined;
 let _originatorEscrowAmount = 10000;
 let _takerEscrowAmount = _originatorEscrowAmount; // the same for this bootstrap version
 
+
 // @todo tests are having state dependencies on previous tests - is that an ok pattern?
+
+// @todo should all the test have a catch statement to collect a JVM error? see pattern for checking JVM reverts are thrown when expected.
 
 contract('Agreement', function(accounts) {
     it("should be TBD for the Agreement Subject", function() {
@@ -159,7 +162,7 @@ contract('Agreement', function(accounts) {
 
     it("should only allow Originator and Taker to set Beneficiary", function() {
         return Agreement.deployed().then(function(instance) {
-            return instance.setBeneficiary({from: accounts[3]});
+            return instance.setBeneficiary({from: accounts[2]});
         }).then(function () {
             assert(false,"should have error with throw or revert");
         }).catch(function (err) {
@@ -196,9 +199,71 @@ contract('Agreement', function(accounts) {
         });
     });
 
+    it("should not be in dispute", function() {
+        return Agreement.deployed().then(function(instance) {
+
+            return instance.isDisputed();
+
+        }).then(function (result) {
+
+            assert(!result,"Agreement not in dispute");
+
+        });
+    });
+
     it("should only allow Originator and Taker to set dispute", function() {
         return Agreement.deployed().then(function(instance) {
-            return instance.setDispute({from: accounts[3]});
+            return instance.setDispute({from: accounts[2]});
+        }).then(function () {
+            assert(false,"should have error with throw or revert");
+        }).catch(function (err) {
+            assert.equal(err, "Error: VM Exception while processing transaction: revert", "did not throw or revert as expected");
+        });
+    });
+
+    it("should allow Taker to set dispute", function() {
+        return Agreement.deployed().then(function(instance) {
+
+            return instance.setDispute({from: accounts[1]});
+
+        }).then(function (result) {
+
+            let event = undefined;
+
+            for (var i = 0; i < result.logs.length; i++) {
+                var log = result.logs[i];
+
+                if (log.event === "Dispute") {
+                    event = log;
+                    break;
+                }
+            }
+
+            console.log("Taker set dispute on: " + event.args.agreement);
+
+            assert(event,"Dispute event not received");
+
+        });
+    });
+
+    it("should be in dispute", function() {
+        return Agreement.deployed().then(function(instance) {
+
+            return instance.isDisputed();
+
+        }).then(function (result) {
+
+            assert(result,"Agreement should be in dispute");
+
+        });
+    });
+
+
+    // Only the Adjudicator can set Favour
+
+    it("should only allow Adjudicator to settle dispute", function() {
+        return Agreement.deployed().then(function(instance) {
+            return instance.setDispute({from: accounts[2]});
         }).then(function () {
             assert(false,"should have error with throw or revert");
         }).catch(function (err) {
@@ -207,9 +272,34 @@ contract('Agreement', function(accounts) {
     });
 
 
-    // Only the Adjudicator can set Favour
 
     // Adjudicator can only Favour the parties to the Contract
+
+    it("should allow Adjudicator to provide favour in dispute", function() {
+        return Agreement.deployed().then(function(instance) {
+
+            return instance.setFavour(accounts[1],{from: accounts[9]});
+
+        }).then(function (result) {
+
+            let event = undefined;
+
+            for (var i = 0; i < result.logs.length; i++) {
+                var log = result.logs[i];
+
+                if (log.event === "Favoured") {
+                    event = log;
+                    break;
+                }
+            }
+
+            console.log("Adjudicator set favour on: " + event.args.agreement);
+
+            assert(event,"Favoured event not received");
+
+        });
+    });
+
 
     // test that a balance can be correctly returned
 

@@ -59,6 +59,17 @@ contract Agreement {
         _;
     }
 
+    /**
+    * @notice ensures only isAdjudicator role can call a function
+    */
+
+    modifier isAdjudicator {
+        require(msg.sender == _Adjudicator);
+        _;
+    }
+
+
+
 
     /**
      * @notice event to report a Taker for the Agreement
@@ -75,15 +86,19 @@ contract Agreement {
 
     /**
      * @notice event to notify that the outcome is being disputed
-     * @param disputingParty who as raised the dispute
+     * @param agreement address that emitted the event
+     * @param disputingParty who has raised the dispute
     */
-    event Dispute(address indexed disputingParty);
+    event Dispute(address indexed agreement, address indexed disputingParty);
 
     /**
      * @notice event to notify who the Adjudicator has favoured in the dispute
-     * @param favouredParty who has been determined to be the beneficiary after dispute resolution
+     * @param agreement address that emitted the event
+     * @param adjudicator that determined the beneficiary
+     * @param originator of the agreement
+     * @param favouredParty party settled as beneficiary
     */
-    event Favoured(address indexed adjudicator,address indexed originator, address indexed favouredParty);
+    event Favoured(address indexed agreement, address adjudicator,address originator, address favouredParty);
 
     /**
      * @notice event to notify that the Agreement has been settled
@@ -187,22 +202,26 @@ contract Agreement {
         _Determined = false;
         _Disputed = true;
 
-        emit Dispute(msg.sender);
+        emit Dispute(this,msg.sender);
     }
 
     /// adjudicator settles the contract in one parties favour
     /// if Adjudicator is multi-sig wallet/Adjudicator registry Contract this will be called from that
-    function setFavour(address favoured) isParty public {
-        require(msg.sender == _Adjudicator);
+    function setFavour(address favoured) isAdjudicator public {
 
         _Beneficiary = favoured;
         _Determined = true;
 
-        emit Favoured(_Adjudicator, _Originator, _Beneficiary);
+        emit Favoured(this,_Adjudicator, _Originator, _Beneficiary);
 
     }
 
-    /// causes the settlement [separate set of contracts]
+    /**
+    * @notice This release the escrow to the beneficiary. The logic needs review but it should only release on certain conditions:
+    * - 48 hours after a beneficiary has been set
+    * - a determination is outstanding
+    * @dev critical to get the flow and logic right and independently audited or some form of formal verification
+    */
 
     function settle() public isParty {
 
