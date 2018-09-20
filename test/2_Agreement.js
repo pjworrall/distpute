@@ -300,6 +300,58 @@ contract('Agreement', function(accounts) {
         });
     });
 
+    it("Should be able to settle agreement in favour of beneficiary", function() {
+
+        var agreement;
+        var erc20;
+        var previousBalance;
+
+        return Agreement.deployed().then(function(instance) {
+            agreement = instance;
+            // get the token
+            return Token.at("0x7c21f56495fc1e8cccf850cb3d6d05b74200ac37");
+        }).then(function (token) {
+            erc20 = token;
+            // get the token balance of the Beneficiary
+            return token.balanceOf(accounts[1]);
+        }).then(function (balance) {
+            previousBalance = balance;
+
+            // settle the account
+
+            return agreement.settle({from: accounts[0]});
+
+        }).then(function (result) {
+
+            let event = undefined;
+
+            for (var i = 0; i < result.logs.length; i++) {
+                var log = result.logs[i];
+
+                if (log.event === "Settled") {
+                    event = log;
+                    break;
+                }
+            }
+
+            console.log("Settled to Beneficiary: " + event.args.beneficiary);
+
+            assert(event,"Favoured event not received");
+
+            // but we need to go on to check balance of beneficiary
+
+            return erc20.balanceOf(accounts[1]);
+
+        }).then(function (balance) {
+
+            console.log("Taker balance was: " + previousBalance + ", now it is " + balance);
+
+            // todo maybe should test an exact expected balance
+            assert.notEqual(previousBalance,balance,"balance was not increased as expected");
+
+        });
+    });
+
 
     // test that a balance can be correctly returned
 

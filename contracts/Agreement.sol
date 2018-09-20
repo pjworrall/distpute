@@ -102,11 +102,10 @@ contract Agreement {
 
     /**
      * @notice event to notify that the Agreement has been settled
+     * @param agreement address that emitted the event
      * @param beneficiary who received the proceeds
-     * @param adjudicator Contract or Account that settled the dispute and took the fees
     */
-    event Settled(address indexed beneficiary, address indexed adjudicator);
-
+    event Settled(address indexed agreement, address beneficiary);
 
     /**
      * @notice Constructor to be used by a Factory contract. Note the msg.send is the Factory class and not the Originator.
@@ -218,24 +217,36 @@ contract Agreement {
 
     /**
     * @notice This release the escrow to the beneficiary. The logic needs review but it should only release on certain conditions:
-    * - 48 hours after a beneficiary has been set
+    * - todo 48 hours after a beneficiary has been set
     * - a determination is outstanding
     * @dev critical to get the flow and logic right and independently audited or some form of formal verification
+    * @dev payment for adjudication service not modelled into this yet
     */
 
     function settle() public isParty {
 
-        if (_Disputed == true) {
-            /// fees payable to adjudicator
-        }
+        // how do we count blocks and how do we related blocks to time?
+
+//        if (_Disputed == true) {
+//            /// fees payable to adjudicator
+//        }
 
         /// After satisfying all criteria go ahead and pay fees and settle to the beneficiary
 
-        /// settlement needs to come from the parties from their mutual agreement or from adjudication
+
+        if( _Determined == true) {
+
+            _OriginatorEscrow.release(_Beneficiary);
+
+            _TakerEscrow.release(_Beneficiary);
+
+            // todo need a pattern on the client side to monitor events from called contracts
+
+            emit Settled(this, _Beneficiary);
+
+        }
 
 
-        emit Settled(_Beneficiary, _Adjudicator);
-        // although _Adjudicator might not have been used
     }
 
     /// cancellation needs to be agreed by both parties and, if an adjudicator was used, will still pay their fees
@@ -250,7 +261,8 @@ contract Agreement {
             /// fees payable to adjudicator
         }
 
-        /// return balance to parties
+        /// return balance to parties. get balance of each escrow and use token transfer to move both to the beneficiary
+
 
 
         /// kill contract
