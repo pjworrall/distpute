@@ -8,6 +8,8 @@ pragma solidity ^0.4.22;
  * @dev third generation that provides for some escrow
  */
 
+// todo publish any new ABI directly to dependent client code
+
 import "./Escrow.sol";
 
 import 'openzeppelin-solidity/contracts/token/ERC20/IERC20.sol';
@@ -177,7 +179,7 @@ contract Agreement {
 
     /// either party may claim to be the beneficiary
 
-    function setBeneficiary() isParty public {
+    function setBeneficiary() isParty isStaked public {
 
         require(_Determined == false);
 
@@ -193,8 +195,9 @@ contract Agreement {
     }
 
     /// either the placer or the taker can raise a dispute
+    // todo and you should not be able to set dispute unless it is Determined ?
 
-    function setDispute() isParty public {
+    function setDispute() isParty isStaked public {
 
         require(_Disputed == false);
 
@@ -206,7 +209,10 @@ contract Agreement {
 
     /// adjudicator settles the contract in one parties favour
     /// if Adjudicator is multi-sig wallet/Adjudicator registry Contract this will be called from that
+    // todo sould not be able to set this unless the state is Disputed right?
     function setFavour(address favoured) isAdjudicator public {
+
+        require(_Disputed == true);
 
         _Beneficiary = favoured;
         _Determined = true;
@@ -243,6 +249,8 @@ contract Agreement {
             // todo need a pattern on the client side to monitor events from called contracts
 
             emit Settled(this, _Beneficiary);
+
+            // and do we now kill the contractor do we just have a marker to stop the Agreement from serving any more requests?
 
         }
 

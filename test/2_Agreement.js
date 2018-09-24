@@ -355,5 +355,9 @@ contract('Agreement', function(accounts) {
 
     // test that a balance can be correctly returned
 
+    // need to test the isStaked guard on the state changing functions
+
+    // set favour should not be possible if the Agreement is not in Dispute
+
 
 });

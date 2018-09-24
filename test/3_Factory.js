@@ -6,9 +6,15 @@ var Agreement = artifacts.require("Agreement");
 var ERC20Token = "0x7c21f56495fc1e8cccf850cb3d6d05b74200ac37";
 
 contract('Factory', function (accounts) {
+
+    // for comprehension string subject, address taker, address adjudicator
+    let taker = accounts[1];
+    let adjudicator = accounts[9];
+
+
     it("should be able to request an Agreement", function () {
         return Factory.deployed().then(function (instance) {
-            return instance.newAgreement("Dry on Sunday", accounts[1], accounts[1], ERC20Token, {from: accounts[0]});
+            return instance.newAgreement("Dry on Sunday", taker, adjudicator, ERC20Token, {from: accounts[0]});
         }).then(function (receipt) {
 
             // @todo I am referring to the logs in the receipt object but presuming the only
@@ -26,7 +32,7 @@ contract('Factory', function (accounts) {
 
     it("should report an escrow account for the Originator", function () {
         return Factory.deployed().then(function (instance) {
-            return instance.newAgreement("Rain on Monday", accounts[1], accounts[1], ERC20Token, {from: accounts[0]});
+            return instance.newAgreement("Rain on Monday", taker, adjudicator, ERC20Token, {from: accounts[0]});
         }).then(function (result) {
 
             //console.log(JSON.stringify(result));
